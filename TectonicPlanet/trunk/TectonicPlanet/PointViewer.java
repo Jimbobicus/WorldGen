@@ -13,7 +13,7 @@ import javax.vecmath.*;
 import javax.media.j3d.*;
 import java.util.*;
 import javax.imageio.*;
-import com.sun.image.codec.jpeg.*;
+//import com.sun.image.codec.jpeg.*;
 
 
 

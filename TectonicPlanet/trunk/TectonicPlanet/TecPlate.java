@@ -3,20 +3,23 @@ package TectonicPlanet;
 // Standard Java imports
 import java.awt.*;
 import javax.vecmath.*;
+
+import TectonicPlanet.TecPoint;
+
 import java.util.*;
 
 
 
 public class TecPlate {
   private Point3d pos=null;		// Notional plate centre
-  private ArrayList points=null;	// List of points of this plate
+  private ArrayList<TecPoint> points=null;	// List of points of this plate
   //private Vector tets=null;	// List of tetrahedrons for this plate
   private Color col=null;
   private Vector3d force=null;
   private double rotation=0;
   public double densityTweak=0;
   public Vector3d splitVector=null;
-  public ArrayList edgeLinkPairs=null;
+  public ArrayList<LinkPair> edgeLinkPairs=null;
   public Point3d meanPos1=null,meanPos2=null;
   public Vector3d meanVec1=null,meanVec2=null;
 	public boolean linkRemoved=false;
@@ -29,11 +32,11 @@ public class TecPlate {
   }
   private void init() {
     pos=new Point3d();
-    points=new ArrayList();
+    points=new ArrayList<TecPoint>();
     col=new Color((float)(Math.random()),(float)(Math.random()),(float)(Math.random()));
     force=new Vector3d();
     splitVector=new Vector3d();
-    edgeLinkPairs=new ArrayList();
+    edgeLinkPairs=new ArrayList<LinkPair>();
 		resetForces();
   }
   public void addPoint(TecPoint p) {
@@ -45,14 +48,14 @@ public class TecPlate {
   public TecPoint getPoint(int i) {
     return (TecPoint)points.get(i);
   }
-  public ArrayList getPoints() {return points;}
+  public ArrayList<TecPoint> getPoints() {return points;}
   public Point3d getPos() {return pos;}
   public Color getCol() {return col;}
   public void setCol(Color c) {col=c;}
   //public ArrayList getTets() {return tets;}
 	
-	public ArrayList getLinks(LinkSystem linkSystem) {
-		ArrayList out=new ArrayList();
+	public ArrayList<LinkPair> getLinks(LinkSystem linkSystem) {
+		ArrayList<LinkPair> out=new ArrayList<LinkPair>();
 		TecPoint p;
 		for (int i=0; i<points.size(); i++) {
 			p=getPoint(i);

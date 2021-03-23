@@ -6,31 +6,31 @@ import java.util.*;
 
 
 public class PointsByHeight {
-  private TreeMap tree;
+  private TreeMap<Double, ArrayList<TecPoint>> tree;
 	public PointsByHeight() {
-	  tree=new TreeMap();
+	  tree=new TreeMap<Double, ArrayList<TecPoint>>();
 	}
 	public void add(TecPoint tp) {
-	  Double height=new Double(tp.getSurfaceHeight());
+	  Double height=(tp.getSurfaceHeight());
 		if (tree.containsKey(height)) {
 		  // Already have a point with that height, add it to the set
-			ArrayList v=(ArrayList)tree.get(height);
+			ArrayList<TecPoint> v=tree.get(height);
 			v.add(tp);
 		} else {
 			// First point witht that height, make a new vector entry
-			ArrayList n=new ArrayList();
+			ArrayList<TecPoint> n=new ArrayList<TecPoint>();
 			n.add(tp);
 			tree.put(height,n);
 		}
 	}
-	public ArrayList get(double h) {
-	  return (ArrayList)tree.get(new Double(h));
+	public ArrayList<TecPoint> get(double h) {
+	  return tree.get((h));
 	}
-	public ArrayList first() {
-	  return (ArrayList)tree.get(tree.firstKey());
+	public ArrayList<TecPoint> first() {
+	  return tree.get(tree.firstKey());
 	}
-	public ArrayList last() {
-	  return (ArrayList)tree.get(tree.lastKey());
+	public ArrayList<TecPoint> last() {
+	  return tree.get(tree.lastKey());
 	}
 	public void removeFirst() {
 	  tree.remove(tree.firstKey());

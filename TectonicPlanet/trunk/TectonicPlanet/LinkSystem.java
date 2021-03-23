@@ -10,6 +10,9 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.vecmath.*;
+
+//import TectonicPlanet.TecPoint;
+
 import javax.media.j3d.*;
 import java.util.*;
 
@@ -18,12 +21,12 @@ import java.util.*;
  * @author Tom Groves
  */
 public class LinkSystem {
-  private HashMap tree;
-	private HashMap pointLinks;
+  private HashMap<Long, LinkPair> tree;
+	private HashMap<TecPoint, ArrayList<TecPoint>> pointLinks;
 	
   public LinkSystem() {
-    tree=new HashMap();
-    pointLinks=new HashMap();
+    tree=new HashMap<Long, LinkPair>();
+    pointLinks=new HashMap<TecPoint, ArrayList<TecPoint>>();
   }
   public void addLink(TecPoint a, TecPoint b) {
 		if (!hashOK(a,b)) {
@@ -43,37 +46,37 @@ public class LinkSystem {
 			System.exit(1);
 		}
     LinkPair nl=new LinkPair(a,b);
-    if (getLinkPair(new Long(getHash(a,b)))!=null) {
+    if (getLinkPair((getHash(a,b)))!=null) {
       // Increment the count of that link
-      getLinkPair(new Long(getHash(a,b))).increment();
+      getLinkPair((getHash(a,b))).increment();
     } else {
       // Add new link
-      tree.put(new Long(getHash(a,b)), nl);
+      tree.put((getHash(a,b)), nl);
     }
-		if (!pointLinks.containsKey(a)) pointLinks.put(a,new ArrayList());
-		if (!pointLinks.containsKey(b)) pointLinks.put(b,new ArrayList());
-	  ArrayList v1=getPointLinks(a);
-	  ArrayList v2=getPointLinks(b);
+		if (!pointLinks.containsKey(a)) pointLinks.put(a,new ArrayList<TecPoint>());
+		if (!pointLinks.containsKey(b)) pointLinks.put(b,new ArrayList<TecPoint>());
+	  ArrayList<TecPoint> v1=getPointLinks(a);
+	  ArrayList<TecPoint> v2=getPointLinks(b);
 		if (!v1.contains(b)) v1.add(b);
 		if (!v2.contains(a)) v2.add(a);
   }
   public void removeLink(TecPoint a, TecPoint b) {
     LinkPair nl=new LinkPair(a,b);
-    if (getLinkPair(new Long(getHash(a,b)))!=null) {
+    if (getLinkPair((getHash(a,b)))!=null) {
       // Decrement the count of that link
-      getLinkPair(new Long(getHash(a,b))).decrement();
-      if (getLinkPair(new Long(getHash(a,b))).getCount()==0)
-        tree.remove(new Long(getHash(a,b)));
+      getLinkPair((getHash(a,b))).decrement();
+      if (getLinkPair((getHash(a,b))).getCount()==0)
+        tree.remove((getHash(a,b)));
     } else {
       // WTF?!
       System.out.println("Can't remove that link - it isn't there!");
     }
 		if (pointLinks.containsKey(a)) {
-  	  ArrayList v1=getPointLinks(a);
+  	  ArrayList<TecPoint> v1=getPointLinks(a);
 		  if (v1!=null) v1.remove(b);
 		}
 		if (pointLinks.containsKey(b)) {
-			ArrayList v2=getPointLinks(b);
+			ArrayList<TecPoint> v2=getPointLinks(b);
 			if (v2!=null) v2.remove(a);
 		}
   }
@@ -84,13 +87,13 @@ public class LinkSystem {
     return (LinkPair)tree.get(getHash(a,b));
   }
   public int getCount(TecPoint a, TecPoint b) {
-    LinkPair lp=(LinkPair)tree.get(new Long(getHash(a,b)));
+    LinkPair lp=(LinkPair)tree.get((getHash(a,b)));
     if (lp==null) return 0;
     return lp.getCount();
   }
   public int size() {return tree.size();}
-  public Iterator getIterator() {return tree.values().iterator();}
-  public Collection getCollection() {return tree.values();}
+  public Iterator<LinkPair> getIterator() {return tree.values().iterator();}
+  public Collection<LinkPair> getCollection() {return tree.values();}
   public long getHash(TecPoint a, TecPoint b) {
     long v1=Math.min(a.hash,b.hash);
     long v2=Math.max(a.hash,b.hash);
@@ -99,31 +102,31 @@ public class LinkSystem {
 	public boolean hashOK(TecPoint a, TecPoint b) {
 	  return getHash(a,b)==getHash(b,a);
 	}
-  public void empty() {tree=new HashMap();pointLinks=new HashMap();}
+  public void empty() {tree=new HashMap<Long, LinkPair>();pointLinks=new HashMap<TecPoint, ArrayList<TecPoint>>();}
 	public int getPointLinksSize(TecPoint p) {
 	  if (!pointLinks.containsKey(p)) return -1;
-		ArrayList v=(ArrayList)pointLinks.get(p);
+		ArrayList<TecPoint> v=pointLinks.get(p);
 		return v.size();
 	}
-	public ArrayList getPointLinks(TecPoint p) {
+	public ArrayList<TecPoint> getPointLinks(TecPoint p) {
 	  if (!pointLinks.containsKey(p))
 			return null;
-		return (ArrayList)pointLinks.get(p);
+		return pointLinks.get(p);
 	}
 	public void removePoint(TecPoint p) {
 		if (pointLinks.containsKey(p)) {
-			ArrayList linkedPoints=new ArrayList(getPointLinks(p));
+			ArrayList<TecPoint> linkedPoints=new ArrayList<TecPoint>(getPointLinks(p));
 			for (int i=0; i<linkedPoints.size(); i++)
 				removeLink(p,(TecPoint)linkedPoints.get(i));
 		}
-    ArrayList linkPairVec=new ArrayList(tree.values());
+    ArrayList<LinkPair> linkPairVec=new ArrayList<LinkPair>(tree.values());
 		for (int i=0; i<linkPairVec.size(); i++) {
 			LinkPair lp=(LinkPair)linkPairVec.get(i);
 			if (lp.getA()==p || lp.getB()==p) removeLink(lp.getA(),lp.getB());
 		}
 	}
-	public ArrayList getLinkedPoints(TecPoint p, ArrayList points) {
-	  ArrayList out=new ArrayList();
+	public ArrayList<TecPoint> getLinkedPoints(TecPoint p, ArrayList<TecPoint> points) {
+	  ArrayList<TecPoint> out=new ArrayList<TecPoint>();
 	  TecPoint tempPoint;
 	  for (int i=0; i<points.size(); i++) {
 		  tempPoint=(TecPoint)points.get(i);
@@ -131,10 +134,10 @@ public class LinkSystem {
 		}
 		return out;
 	}
-	public HashSet getLinkedPoints(TecPoint p, HashSet points) {
-	  HashSet out=new HashSet();
+	public HashSet<TecPoint> getLinkedPoints(TecPoint p, HashSet<TecPoint> points) {
+	  HashSet<TecPoint> out=new HashSet<TecPoint>();
 	  TecPoint tempPoint;
-    Iterator iter=points.iterator();
+    Iterator<TecPoint> iter=points.iterator();
     while (iter.hasNext()) {
 	  //for (int i=0; i<points.size(); i++) {
 		  tempPoint=(TecPoint)iter.next();//get(i);
@@ -148,12 +151,12 @@ public class LinkSystem {
     TecPoint a=lp.getA();
     TecPoint b=lp.getB();
     // Find the two points
-    HashSet points1=new HashSet(getPointLinks(a));
-    HashSet points2=new HashSet(getPointLinks(b));
+    HashSet<TecPoint> points1=new HashSet<TecPoint>(getPointLinks(a));
+    HashSet<TecPoint> points2=new HashSet<TecPoint>(getPointLinks(b));
     points1.remove(b);
     points2.remove(a);
     TecPoint p1=null, p2=null, tempPoint;
-    Iterator iter=points2.iterator();
+    Iterator<TecPoint> iter=points2.iterator();
     while (iter.hasNext() && p2==null) {
       tempPoint=(TecPoint)iter.next();
       if (points1.contains(tempPoint)) {
@@ -178,7 +181,7 @@ public class LinkSystem {
   }
 }
 
-class LinkPair implements Comparable {
+class LinkPair implements Comparable<LinkPair> {
   private TecPoint a,b;
   private int count=1;
   private long hash;
@@ -219,14 +222,13 @@ class LinkPair implements Comparable {
       //System.exit(1);
     }
   }
-  public int compareTo(Object ob) {
+  public int compareTo(LinkPair other) {
     // Compares this object with the specified object for order.
     try {
-      LinkPair other=(LinkPair)ob;
       if ((other.a==a && other.b==b) || (other.a==b && other.b==a)) return 0;
     } catch(Exception e) {}
 
-    return hashCode()-ob.hashCode();
+    return hashCode()-other.hashCode();
   }
   public TecPoint getA() {return a;}
   public TecPoint getB() {return b;}

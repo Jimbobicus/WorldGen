@@ -16,7 +16,7 @@ import java.util.*;
 
 
 
-public class TecPoint implements Comparable {
+public class TecPoint implements Comparable<TecPoint> {
   private World world=null;
   private Point3d pos, oldpos, rotPos;
   private TecPlate plate=null;
@@ -291,7 +291,7 @@ public class TecPoint implements Comparable {
 	  return getSurfaceHeight()-seaLevel;
 	}
 	
-	public int compareTo(Object o) {
+	public int compareTo(TecPoint o) {
     // Compares this object with the specified object for order.
 		return this.hashCode()-o.hashCode();
 	}
